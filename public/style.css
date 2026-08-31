@@ -5,6 +5,11 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.btn {
+    border-radius: 8px;
+    border: none;
+}
+
 body {
     background-color: #f0f4f8;
     color: #333;
@@ -12,7 +17,7 @@ body {
 }
 
 .welcome-container {
-    margin-top: 80px;
+    margin: 80px 0 80px;
     text-align: center;
 }
 
@@ -20,10 +25,10 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: end;
+    align-items: center;
     gap: 20px;
     background-color: #ffffff;
-    padding: 20px 10px;
+    padding: 20px 10px 10px;
 }
 
 .title {
@@ -34,17 +39,16 @@ body {
 }
 
 .img-logo {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     max-width: clamp(100px, 13%, 80px);
     border-radius: 50%;
     aspect-ratio: 20 / 20;
     object-fit: cover;
     flex-shrink: 0;
-    object-fit: cover;
     margin-right: 10px;
-    border: 3px solid #111827;
 }
+
 
 .title span {
     color: #2563eb;
@@ -58,7 +62,6 @@ body {
 }
 
 .subtitle span {
-    
     color: #2563eb;
 }
 
@@ -87,7 +90,6 @@ body {
 
 .role-card:hover {
     border: 2px solid #2563eb;
-    
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
 }
@@ -149,3 +151,151 @@ body {
 .role-card .btn:active {
     transform: translateY(1px); 
 }
+
+footer {
+    min-height: 20vh;
+    padding: 40px 20px 10px;
+    margin-top: 20px;
+    background-color: #ffffff;
+}
+
+.btn-enlaces {
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+    gap: 10px;
+}
+
+.btn-enlaces .btn {
+    padding: 10px;
+    display: flex;
+    align-items: end;
+    gap: 6px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    transition: all 0.2s ease;
+}
+
+.whatsapp {
+    color: #1A7A3E;
+    background-color: rgba(37,211,102,0.09);
+    border: 1px solid rgba(37,211,102,0.28);
+}
+.whatsapp:hover {
+    cursor: pointer;
+    transform: translateY(-2px);
+    background-color: rgba(37,211,102,0.16);
+}
+
+.whatsapp:active{
+    transform: translateY(1px);
+}
+
+.sitio-web {
+    color: #2563EB;
+    background-color: rgba(37,99,235,0.07);
+    border: 1px solid rgba(37,99,235,0.18);
+}
+
+.sitio-web:hover {
+    cursor: pointer;
+    transform: translateY(-2px);
+    background-color: rgba(37,99,235,0.13);
+}
+
+.sitio-web:active{
+    transform: translateY(1px);
+}
+
+.btn-enlaces .icon{
+    font-size: 0.9rem !important;
+    padding: 0; 
+}
+
+.linea-hor{
+    margin: 15px;
+    border: none;
+    height:1px;
+    background-color: #79797b;
+}
+
+.copyright {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    color: #79797b;
+}
+
+.copyright .img-logo{
+    width: 60px;
+    height: 60px;
+}
+
+/*Panel Profesor y Estudiante*/
+.title-in {
+    font-size: clamp(0.8rem, 2rem, 3rem);
+}
+
+/* Panel Profesor*/
+.volver {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px 6px;
+    font-weight: bold;
+    color: #2563EB;
+    background-color: rgba(37,99,235,0.07);
+    border: 1px solid rgba(37,99,235,0.18);
+}
+
+.volver:hover {
+    cursor: pointer;
+    background-color: rgba(37,99,235,0.13);
+}
+
+.volver:active{
+    transform: translateY(1px);
+}
+
+.top-bar {
+    margin: 20px 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.top-bar .btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ffffff;
+    color: #2563eb;
+    border: 2px solid #2563eb;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.top-bar .btn:hover {
+    background-color: #2563eb;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.2);
+}
+
+.top-bar .btn:active{
+    transform: translateY(1px);
+}
+
+.top-bar .icon {
+    font-size: 3rem !important;
+    padding: 0;
+}
+

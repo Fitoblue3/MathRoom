@@ -6,18 +6,19 @@
     <title>MathRoom - Bienvenida</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
     <body>
         <header class="header">
             <h1 class="title">Math <span>Room</span></h1>
-            <img class="img-logo" src="https://raw.githubusercontent.com/Fitoblue3/Portafolio-Web/refs/heads/main/images/Fotos_Jefferson/Logo_sin-letras.webp" alt="Logo">
+            <img class="img-logo" src="images/Logo.svg" alt="Logo">
         </header>
         <main class="welcome-container">
             <div class="subtitle">
                 <p>Selecciona tu rol para <br> <span>comenzar la sesión</span></p>   
             </div>
             
-            <div class="roles-grid">
+            <section class="roles-grid">
                 <div class="role-card profesor">
                 
                     <span class="icon material-symbols-outlined">supervisor_account</span>
@@ -32,8 +33,19 @@
                     <p>Únete a la sala de tu profe, responde los ejercicios y pon a prueba tu conocimiento.</p>
                     <button class="btn" onclick="window.location.href='estudiante.html'">Unirme a la Sala</button>
                 </div>
-            </div>
+            </section>
 
         </main>
+        <footer>
+            <div class="btn-enlaces">
+                <button class="btn whatsapp" onclick="window.open('https://wa.me/50671519859', '_blank')"><i class="icon bi bi-whatsapp"></i>¿Tienes una duda? Escríbeme por WhatsApp</button>
+                <button class="btn sitio-web" onclick="window.open('https://fitoblue3.github.io/Portafolio-Web/')"><span class="icon material-symbols-outlined">language</span>Mi sitio web</button>
+            </div>
+            <hr class="linea-hor">
+            <div class="copyright">
+                <p>&copy; 2026 Jefferson Gómez Fonseca</p>
+                <img class="img-logo" src="images/Logo.svg" alt="Logo">
+            </div>
+        </footer>
     </body>
 </html>
