@@ -1,0 +1,24 @@
+{
+  "name": "mathroom",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fitoblue3/MathRoom.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Fitoblue3/MathRoom/issues"
+  },
+  "homepage": "https://github.com/Fitoblue3/MathRoom#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

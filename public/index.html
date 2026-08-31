@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathRoom - Bienvenida</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+    <body>
+        <header class="header">
+            <h1 class="title">Math <span>Room</span></h1>
+            <img class="img-logo" src="https://raw.githubusercontent.com/Fitoblue3/Portafolio-Web/refs/heads/main/images/Fotos_Jefferson/Logo_sin-letras.webp" alt="Logo">
+        </header>
+        <main class="welcome-container">
+            <div class="subtitle">
+                <p>Selecciona tu rol para <br> <span>comenzar la sesión</span></p>   
+            </div>
+            
+            <div class="roles-grid">
+                <div class="role-card profesor">
+                
+                    <span class="icon material-symbols-outlined">supervisor_account</span>
+                    <h2>Profesor</h2>
+                    <p>Crea preguntas, genera el código QR y revisa las respuestas en tiempo real.</p>
+                    <button class="btn" onclick="window.location.href='profesor.html'">Entrar como Profe</button>
+                </div>
+
+                <div class="role-card estudiante"> 
+                    <span class="icon material-symbols-outlined">person</span>
+                    <h2>Estudiante</h2>
+                    <p>Únete a la sala de tu profe, responde los ejercicios y pon a prueba tu conocimiento.</p>
+                    <button class="btn" onclick="window.location.href='estudiante.html'">Unirme a la Sala</button>
+                </div>
+            </div>
+
+        </main>
+    </body>
+</html>
