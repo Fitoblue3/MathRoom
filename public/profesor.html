@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <script src="script.js" defer></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script-profesor.js" defer></script>
 </head>
     <body>
         <header class="header">
@@ -42,7 +43,7 @@
                     <input type="text" id="respuesta" placeholder="Ej: 17">
                 </div>
 
-                <button class="btn profesor-btn">Lanzar Pregunta<span class="icon material-symbols-outlined">arrow_outward</span></button>
+                <button class="btn profesor-btn" id="btnLanzar">Lanzar Pregunta<span class="icon material-symbols-outlined">arrow_outward</span></button>
                 
                 <div class="pregunta-activa-box" id="boxPreguntaActiva" style="display: none;">
                     <span>Pregunta actual en pantalla:</span>
