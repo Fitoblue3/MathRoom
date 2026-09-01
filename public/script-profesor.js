@@ -17,11 +17,38 @@ const respuestasGrid = document.getElementById('respuestasGrid');
 const cantEstudiantes = document.getElementById('cantEstudiantes');
 const listaEstudiantesContainer = document.getElementById('listaEstudiantesContainer');
 
+let qrGenerado = null;
+
 // --- EVENTOS DE MODALES ---
-btnAbrirQr.addEventListener('click', () => modalQr.classList.add('active'));
-modalQr.addEventListener('click', (e) => { if (e.target === modalQr) modalQr.classList.remove('active'); });
+
+// Evento para abrir el Modal y generar el QR
+btnAbrirQr.addEventListener('click', () => {
+    modalQr.classList.add('active');
+
+    const contenedorQr = document.getElementById('qrcode');
+    
+    // Si aún no se ha generado el QR, crearlo
+    if (!qrGenerado) {
+        contenedorQr.innerHTML = ''; 
+
+        const ipLocal = "172.16.70.2";
+        const urlEstudiante = `http://${ipLocal}:3000/estudiante.html?pin=281007`;
+
+        qrGenerado = new QRCode(contenedorQr, {
+            text: urlEstudiante,
+            width: 200,
+            height: 200,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+});
 
 btnAbrirLista.addEventListener('click', () => modalLista.classList.add('active'));
+
+// Cierre de modales al hacer clic afuera
+modalQr.addEventListener('click', (e) => { if (e.target === modalQr) modalQr.classList.remove('active'); });
 modalLista.addEventListener('click', (e) => { if (e.target === modalLista) modalLista.classList.remove('active'); });
 
 // --- CONEXIÓN INICIAL ---
