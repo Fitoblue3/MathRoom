@@ -12,3 +12,19 @@ modal.addEventListener('click', (event) => {
         modal.classList.remove('active');
     }
 });
+
+// Referencias para el modal de Lista de Estudiantes
+const modalLista = document.getElementById('modalLista');
+const btnAbrirLista = document.getElementById('btnAbrirLista');
+
+// Abrir el modal al presionar "Mostrar lista de estudiantes"
+btnAbrirLista.addEventListener('click', () => {
+    modalLista.classList.add('active');
+});
+
+// Cerrar el modal al hacer clic en el fondo oscuro
+modalLista.addEventListener('click', (event) => {
+    if (event.target === modalLista) {
+        modalLista.classList.remove('active');
+    }
+})

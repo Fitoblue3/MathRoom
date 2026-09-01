@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MathRoom - Panel del Profesor</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <script src="script.js" defer></script>
 </head>
     <body>
@@ -28,7 +29,7 @@
                 </button>
             </section>
 
-            <section>
+            <section class="nueva-pregunta-card">
                 <h2><span class="icon material-symbols-outlined">edit_square</span> Nueva Pregunta</h2>
                 <div class="form-group">
                     <label for="pregunta">Ejercicio / Operación</label>
@@ -42,26 +43,52 @@
                 </div>
 
                 <button class="btn profesor-btn">Lanzar Pregunta<span class="icon material-symbols-outlined">arrow_outward</span></button>
+                
+                <div class="pregunta-activa-box" id="boxPreguntaActiva" style="display: none;">
+                    <span>Pregunta actual en pantalla:</span>
+                    <strong id="textoPreguntaActiva">--</strong>
+                </div>
             </section>
 
             <section class="card-section respuestas-section">
                 <h2><span class="material-symbols-outlined">monitoring</span> Respuestas en Tiempo Real</h2>
                 
-                <div class="respuestas-grid">
-                    <!-- Respuesta correcta -->
+                <div class="respuestas-grid" id="respuestasGrid">
+                    <!-- respuesta correcta -->
                     <div class="respuesta-card correcto">
-                        <span class="nombre">Pedro</span>
-                        <span class="estado-badge"><span class="material-symbols-outlined">check_circle</span> Correcto</span>
+                        <div class="estudiante-info">
+                            <span class="nombre">Justin</span>
+                            <span class="respuesta-texto">Respondió: 17</span>
+                        </div>
+                        <span class="estado-badge">
+                            <span class="material-symbols-outlined">check_circle</span> Correcto
+                        </span>
                     </div>
 
-                    <!-- Respuesta incorrecta -->
+                    <!-- respuesta incorrecta -->
                     <div class="respuesta-card incorrecto">
-                        <span class="nombre">María</span>
-                        <span class="estado-badge"><span class="material-symbols-outlined">cancel</span> Incorrecto</span>
+                        <div class="estudiante-info">
+                            <span class="nombre">Keylor</span>
+                            <span class="respuesta-texto">Respondió: 14</span>
+                        </div>
+                        <span class="estado-badge">
+                            <span class="material-symbols-outlined">cancel</span> Incorrecto
+                        </span>
                     </div>
                 </div>
             </section>
         </main>
+        <footer>
+            <div class="btn-enlaces">
+                <button class="btn whatsapp" onclick="window.open('https://wa.me/50671519859', '_blank')"><i class="icon bi bi-whatsapp"></i>¿Tienes una duda? Escríbeme por WhatsApp</button>
+                <button class="btn sitio-web" onclick="window.open('https://fitoblue3.github.io/Portafolio-Web/')"><span class="icon material-symbols-outlined">language</span>Mi sitio web</button>
+            </div>
+            <hr class="linea-hor">
+            <div class="copyright">
+                <p>&copy; 2026 Jefferson Gómez Fonseca</p>
+                <img class="img-logo" src="images/Logo.svg" alt="Logo">
+            </div>
+        </footer>
 
         <div class="modal-overlay" id="modalQr">
             <div class="modal-card">
@@ -69,15 +96,49 @@
                 <p>Escanea el código QR o ingresa el PIN:</p>
                 
                 <div class="qr-box-large">
-                    <!-- Aquí dibujaremos el QR dinámico más adelante -->
+                    <!-- Dibujar QR -->
                 
                     <span class="material-symbols-outlined qr-placeholder-large">qr_code_2</span>
                 </div>
 
                 <div class="pin-container">
                     <span class="pin-label">CÓDIGO PIN:</span>
-                    <span class="pin-code" id="codigoPin">849 201</span>
+                    <span class="pin-code" id="codigoPin">281007</span>
                 </div>
+
+                <p class="modal-tip">Haz clic fuera de este recuadro para cerrar</p>
+            </div>
+        </div>
+
+        <!-- VENTANA EMERGENTE (MODAL LISTA DE ESTUDIANTES) -->
+        <div class="modal-overlay" id="modalLista">
+            <div class="modal-card modal-lista-card">
+                <h2><span class="icon material-symbols-outlined">patient_list</span>Estudiantes Conectados</h2>
+                <p>Lista de alumnos unidos a la sala en tiempo real.</p>
+        
+                <div class="contador-estudiantes">
+                    <span>Total unidos:</span>
+                    <strong id="cantEstudiantes">2</strong>
+                </div>
+
+                <ul class="estudiantes-list" id="listaEstudiantesContainer">
+                    <!-- Ejemplos visuales de estudiantes en la lista -->
+                    <li class="estudiante-item">
+                        <div class="estudiante-user">
+                            <span class="material-symbols-outlined icon-user">account_circle</span>
+                            <span>Justin</span>
+                        </div>
+                        <span class="badge-conectado">En línea</span>
+                    </li>
+
+                    <li class="estudiante-item">
+                        <div class="estudiante-user">
+                            <span class="material-symbols-outlined icon-user">account_circle</span>
+                            <span>Keylor</span>
+                        </div>
+                        <span class="badge-conectado">En línea</span>
+                    </li>
+                </ul>
 
                 <p class="modal-tip">Haz clic fuera de este recuadro para cerrar</p>
             </div>
