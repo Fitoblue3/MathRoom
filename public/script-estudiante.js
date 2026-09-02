@@ -1,12 +1,10 @@
-// Conexión con el servidor Socket.IO
 const socket = io();
 
-// Elementos de los Pasos
+// Elementos del DOM
 const pasoPin = document.getElementById('pasoPin');
 const pasoNombre = document.getElementById('pasoNombre');
 const pasoEjercicio = document.getElementById('pasoEjercicio');
 
-// Inputs y Botones
 const inputPin = document.getElementById('inputPin');
 const btnValidarPin = document.getElementById('btnValidarPin');
 
@@ -24,8 +22,16 @@ const feedbackRespuesta = document.getElementById('feedbackRespuesta');
 let pinActual = "";
 let nombreActual = "";
 
-// AUTOMATIZACIÓN POR QR: Leer PIN en la URL (?pin=XXXXXX)
+// --- AUTO-RECONEXIÓN Y LECTURA DE QR ---
 window.addEventListener('DOMContentLoaded', () => {
+    const pinGuardado = sessionStorage.getItem('mathroom_pin');
+    const nombreGuardado = sessionStorage.getItem('mathroom_nombre');
+
+    if (pinGuardado && nombreGuardado) {
+        intentarReconexion(pinGuardado, nombreGuardado);
+        return;
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const pinDesdeUrl = urlParams.get('pin');
 
@@ -38,10 +44,31 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Paso 1 -> Paso 2 (Validar PIN manual)
+function intentarReconexion(pin, nombre) {
+    pinActual = pin;
+    nombreActual = nombre;
+    lblPin.textContent = pin;
+    lblNombre.textContent = nombre;
+
+    socket.emit('estudiante:unirse', { pin: pinActual, nombre: nombreActual }, (respuesta) => {
+        if (!respuesta.exito) {
+            limpiarSesionLocal();
+            return;
+        }
+
+        pasoPin.style.display = 'none';
+        pasoNombre.style.display = 'none';
+        pasoEjercicio.style.display = 'flex';
+
+        if (respuesta.preguntaActual) {
+            textoPreguntaEstudiante.textContent = respuesta.preguntaActual;
+        }
+    });
+}
+
+// Validar PIN manual
 btnValidarPin.addEventListener('click', () => {
     const pin = inputPin.value.trim();
-
     if (pin.length !== 6) {
         alert('Por favor ingresa un código PIN válido de 6 dígitos.');
         return;
@@ -53,7 +80,7 @@ btnValidarPin.addEventListener('click', () => {
     pasoNombre.style.display = 'flex';
 });
 
-// Paso 2 -> Paso 3 (Unirse a la sala en el backend)
+// Unirse a la sala
 btnEntrarSala.addEventListener('click', () => {
     const nombre = inputNombre.value.trim();
     if (!nombre) {
@@ -64,14 +91,15 @@ btnEntrarSala.addEventListener('click', () => {
     nombreActual = nombre;
     lblNombre.textContent = nombre;
 
-    // Emitir evento para unirse a la sala en el servidor
     socket.emit('estudiante:unirse', { pin: pinActual, nombre: nombreActual }, (respuesta) => {
         if (!respuesta.exito) {
             alert(respuesta.mensaje);
             return;
         }
 
-        // Si se unió con éxito, pasamos al panel de ejercicios
+        sessionStorage.setItem('mathroom_pin', pinActual);
+        sessionStorage.setItem('mathroom_nombre', nombreActual);
+
         pasoNombre.style.display = 'none';
         pasoEjercicio.style.display = 'flex';
 
@@ -81,7 +109,7 @@ btnEntrarSala.addEventListener('click', () => {
     });
 });
 
-// --- RECEPTOR EN TIEMPO REAL: NUEVA PREGUNTA DEL PROFESOR ---
+// Receptor de nueva pregunta
 socket.on('estudiante:nueva-pregunta', (datos) => {
     textoPreguntaEstudiante.textContent = datos.texto;
     respuestaEstudiante.value = '';
@@ -90,10 +118,9 @@ socket.on('estudiante:nueva-pregunta', (datos) => {
     feedbackRespuesta.style.display = 'none';
 });
 
-// --- ENVIAR RESPUESTA AL PROFESOR ---
+// Enviar respuesta
 btnEnviarRespuesta.addEventListener('click', () => {
     const respuestaTexto = respuestaEstudiante.value.trim();
-
     if (!respuestaTexto) {
         alert('Escribe una respuesta antes de enviar.');
         return;
@@ -101,7 +128,6 @@ btnEnviarRespuesta.addEventListener('click', () => {
 
     socket.emit('estudiante:responder', respuestaTexto, (respuesta) => {
         if (respuesta.exito) {
-            // Deshabilitar input y mostrar mensaje de confirmación
             respuestaEstudiante.disabled = true;
             btnEnviarRespuesta.disabled = true;
             feedbackRespuesta.style.display = 'flex';
@@ -111,21 +137,24 @@ btnEnviarRespuesta.addEventListener('click', () => {
     });
 });
 
-// Listener cuando el profesor cierra la sala o sale
+// Cierre de sala por el profesor
 socket.on('estudiante:sala-cerrada', (datos) => {
     alert(datos.mensaje);
+    limpiarSesionLocal();
+});
 
-    // 1. Ocultar el panel del ejercicio y volver al selector de PIN
+function limpiarSesionLocal() {
+    sessionStorage.removeItem('mathroom_pin');
+    sessionStorage.removeItem('mathroom_nombre');
+
     pasoEjercicio.style.display = 'none';
     pasoNombre.style.display = 'none';
     pasoPin.style.display = 'flex';
 
-    // 2. Limpiar variables de sesión y campos de texto
     pinActual = "";
     nombreActual = "";
     inputPin.value = "";
     inputNombre.value = "";
 
-    // 3. Limpiar parámetros de la URL (?pin=...) sin recargar la página para evitar auto-logins
     window.history.replaceState({}, document.title, window.location.pathname);
-});
+}

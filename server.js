@@ -33,23 +33,29 @@ io.on('connection', (socket) => {
     // --- EVENTOS DEL PROFESOR ---
 
     // El profesor crea una nueva sala dinámicamente
-    socket.on('profe:crear-sala', (callback) => {
-        const nuevoPin = generarPinUnico();
+socket.on('profe:crear-sala', (datos, callback) => {
+        let pinUsar = (datos && datos.pinReconexion && salas[datos.pinReconexion]) 
+            ? datos.pinReconexion 
+            : generarPinUnico();
 
-        salas[nuevoPin] = {
-            pin: nuevoPin,
-            profeSocketId: socket.id,
-            preguntaActual: null,
-            estudiantes: [],
-            respuestas: []
-        };
+        if (!salas[pinUsar]) {
+            salas[pinUsar] = {
+                pin: pinUsar,
+                profeSocketId: socket.id,
+                preguntaActual: null,
+                estudiantes: [],
+                respuestas: []
+            };
+        } else {
+            salas[pinUsar].profeSocketId = socket.id;
+        }
 
-        socket.join(nuevoPin);
-        socket.pinSala = nuevoPin; // Guardamos el PIN en la sesión del socket
+        socket.join(pinUsar);
+        socket.pinSala = pinUsar;
+        socket.esProfe = true;
 
-        console.log(`Sala creada con PIN: ${nuevoPin}`);
-
-        callback({ exito: true, pin: nuevoPin });
+        console.log(`Sala activa con PIN: ${pinUsar}`);
+        if (typeof callback === 'function') callback({ exito: true, pin: pinUsar });
     });
 
     // El profe lanza una nueva pregunta en su sala

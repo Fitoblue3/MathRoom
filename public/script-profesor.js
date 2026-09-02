@@ -1,4 +1,3 @@
-// Conexión con el servidor Socket.IO
 const socket = io();
 
 // Referencias del DOM
@@ -7,7 +6,7 @@ const btnAbrirQr = document.getElementById('btnAbrirQr');
 const modalLista = document.getElementById('modalLista');
 const btnAbrirLista = document.getElementById('btnAbrirLista');
 
-const codigoPinLabel = document.getElementById("codigoPin")
+const codigoPinLabel = document.getElementById("codigoPin");
 
 const inputPregunta = document.getElementById('pregunta');
 const inputRespuesta = document.getElementById('respuesta');
@@ -19,33 +18,31 @@ const respuestasGrid = document.getElementById('respuestasGrid');
 const cantEstudiantes = document.getElementById('cantEstudiantes');
 const listaEstudiantesContainer = document.getElementById('listaEstudiantesContainer');
 
-let qrGenerado = null;
 let pinSalaActual = "";
 
 // --- CONEXIÓN E INICIALIZACIÓN DE SALA ---
 socket.on('connect', () => {
-    // Pedir al servidor la creación de una sala única
-    socket.emit('profe:crear-sala', (respuesta) => {
+    const pinGuardado = sessionStorage.getItem('mathroom_profe_pin');
+
+    socket.emit('profe:crear-sala', { pinReconexion: pinGuardado }, (respuesta) => {
         if (respuesta.exito) {
             pinSalaActual = respuesta.pin;
-            if (codigoPinLabel) codigoPinLabel.textContent = pinSalaActual;
+            sessionStorage.setItem('mathroom_profe_pin', pinSalaActual);
 
+            if (codigoPinLabel) {
+                codigoPinLabel.textContent = pinSalaActual;
+            }
         }
     });
-})
+});
 
 // --- EVENTOS DE MODALES ---
-
-// Evento para abrir el Modal y generar el QR
 btnAbrirQr.addEventListener('click', () => {
     modalQr.classList.add('active');
-
     const contenedorQr = document.getElementById('qrcode');
     
-    // Si aún no se ha generado el QR, crearlo
     if (pinSalaActual) {
         contenedorQr.innerHTML = ''; 
-
         const ipLocal = "172.16.70.2";
         const urlEstudiante = `http://${ipLocal}:3000/estudiante.html?pin=${pinSalaActual}`;
 
@@ -62,14 +59,8 @@ btnAbrirQr.addEventListener('click', () => {
 
 btnAbrirLista.addEventListener('click', () => modalLista.classList.add('active'));
 
-// Cierre de modales al hacer clic afuera
 modalQr.addEventListener('click', (e) => { if (e.target === modalQr) modalQr.classList.remove('active'); });
 modalLista.addEventListener('click', (e) => { if (e.target === modalLista) modalLista.classList.remove('active'); });
-
-// --- CONEXIÓN INICIAL ---
-socket.on('connect', () => {
-    socket.emit('profe:iniciar');
-});
 
 // --- LANZAR PREGUNTA ---
 btnLanzar.addEventListener('click', () => {
@@ -81,17 +72,15 @@ btnLanzar.addEventListener('click', () => {
         return;
     }
 
-    // Emitir la pregunta al servidor
     socket.emit('profe:lanzar-pregunta', { texto, respuestaCorrecta });
 
-    // Actualizar interfaz del profesor
     textoPreguntaActiva.textContent = texto;
     boxPreguntaActiva.style.display = 'flex';
     inputPregunta.value = '';
     inputRespuesta.value = '';
 });
 
-// --- RECEPTOR EN TIEMPO REAL: LISTA DE ESTUDIANTES ---
+// --- LISTA DE ESTUDIANTES EN TIEMPO REAL ---
 socket.on('profe:actualizar-estudiantes', (estudiantes) => {
     cantEstudiantes.textContent = estudiantes.length;
     listaEstudiantesContainer.innerHTML = '';
@@ -110,7 +99,7 @@ socket.on('profe:actualizar-estudiantes', (estudiantes) => {
     });
 });
 
-// --- RECEPTOR EN TIEMPO REAL: RESPUESTAS DE ALUMNOS ---
+// --- RESPUESTAS EN TIEMPO REAL ---
 socket.on('profe:actualizar-respuestas', (respuestas) => {
     respuestasGrid.innerHTML = '';
 
@@ -129,9 +118,4 @@ socket.on('profe:actualizar-respuestas', (respuestas) => {
         `;
         respuestasGrid.appendChild(div);
     });
-});
-
-// Notificar al servidor inmediatamente si el profesor abandona o recarga la página
-window.addEventListener('beforeunload', () => {
-    socket.emit('profe:cerrar-sala-manual');
 });

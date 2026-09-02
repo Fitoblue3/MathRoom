@@ -39,13 +39,10 @@ body {
 }
 
 .img-logo {
-    width: 80px;
+    width: 60px;
     height: 80px;
     max-width: clamp(100px, 13%, 80px);
-    border-radius: 50%;
-    aspect-ratio: 20 / 20;
     object-fit: cover;
-    flex-shrink: 0;
     margin-right: 10px;
 }
 
@@ -350,17 +347,10 @@ footer {
     font-size: 0.95rem;
 }
 
-/* Caja del QR grande */
-.qr-box-large {
-    margin: 20px auto;
-    width: 220px;
-    height: 220px;
-    border: 2px dashed #cbd5e1;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f8fafc;
+#qrcode{
+    display: flex; 
+    justify-content: 
+    center; margin: 15px 0;
 }
 
 .qr-placeholder-large {
@@ -469,6 +459,7 @@ footer {
 
 .estudiante-user {
     font-weight: bold;
+    text-align: left;
 }
 
 .icon-user {
@@ -579,6 +570,7 @@ footer {
 .pregunta-activa-box strong {
     font-size: 1.2rem;
     color: #1e293b;
+    margin-left: 3px;
 }
 
 /*Respuestas*/
@@ -745,6 +737,7 @@ footer {
     padding-bottom: 12px;
     border-bottom: 1px solid #e2e8f0;
     margin-bottom: 10px;
+    gap: 15px;
 }
 
 .badge-sala, .badge-user {
@@ -753,6 +746,7 @@ footer {
     display: flex;
     align-items: center;
     gap: 4px;
+    text-align: left;
 }
 
 .pregunta-estudiante-box {

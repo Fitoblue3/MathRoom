@@ -35,13 +35,13 @@
                 <h2><span class="icon material-symbols-outlined">edit_square</span> Nueva Pregunta</h2>
                 <div class="form-group">
                     <label for="pregunta">Ejercicio / Operación</label>
-                    <input type="text" id="pregunta" placeholder="Ej: 7 + 10">
+                    <input type="text" id="pregunta" maxlength="40" placeholder="Ej: 7 + 10">
                 </div>
             
 
                 <div class="form-group">
                     <label for="respuesta">Respuesta Correcta</label>
-                    <input type="text" id="respuesta" placeholder="Ej: 17">
+                    <input type="text" id="respuesta" maxlength="10" placeholder="Ej: 17">
                 </div>
 
                 <button class="btn profesor-btn" id="btnLanzar">Lanzar Pregunta<span class="icon material-symbols-outlined">arrow_outward</span></button>
@@ -81,7 +81,7 @@
                 <h2>¡Únete a la Sala!</h2>
                 <p>Escanea el código QR o ingresa el PIN:</p>
                 
-                <div id="qrcode" style="display: flex; justify-content: center; margin: 15px 0;"></div>
+                <div id="qrcode"></div>
 
                 <div class="pin-container">
                     <span class="pin-label">CÓDIGO PIN:</span>

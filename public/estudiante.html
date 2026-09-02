@@ -24,7 +24,7 @@
                 <p class="paso-desc">Ingresa el PIN de 6 dígitos para unirte a la clase de tu profe.</p>
                 
                 <div class="form-group">
-                    <input type="text" id="inputPin" placeholder="Ej: 281007" autocomplete="off" maxlength="6" class="input-center">
+                    <input type="text" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" id="inputPin" placeholder="Ej: 281007" autocomplete="off" maxlength="6" class="input-center">
                 </div>
 
                 <button class="btn estudiante-btn" id="btnValidarPin">
@@ -38,7 +38,7 @@
                 <p class="paso-desc">Tu profesor verá este nombre en su pantalla.</p>
                 
                 <div class="form-group">
-                    <input type="text" id="inputNombre" placeholder="Tu nombre o apodo" autocomplete="off">
+                    <input type="text" id="inputNombre" placeholder="Tu nombre o apodo" maxlength="40" autocomplete="off">
                 </div>
 
                 <button class="btn estudiante-btn" id="btnEntrarSala">
@@ -60,7 +60,7 @@
 
                 <div class="form-group">
                     <label for="respuestaEstudiante">Tu Respuesta</label>
-                    <input type="text" id="respuestaEstudiante" placeholder="Escribe tu resultado aquí...">
+                    <input type="text" id="respuestaEstudiante" placeholder="Escribe tu resultado aquí..." maxlength="10" autocomplete="off">
                 </div>
 
                 <button class="btn estudiante-btn" id="btnEnviarRespuesta">
