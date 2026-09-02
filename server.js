@@ -5,78 +5,104 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    pingTimeout: 2000,   // Espera solo 2 segundos de inactividad antes de considerar desconectado
+    pingInterval: 1000   // Envía un "ping" de control cada 1 segundo
+});
 
 const PORT = 3000;
 
-// Servir la carpeta public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Memoria RAM de la sala actual (Para un solo profesor/sala)
-let salaActual = {
-    pin: "281007", // PIN por defecto
-    preguntaActual: null,
-    estudiantes: [], // Lista de alumnos conectados
-    respuestas: []   // Historial de respuestas de la pregunta actual
-};
+// Objeto para almacenar múltiples salas activas en memoria
+// Ejemplo: { "839201": { preguntaActual: null, estudiantes: [], respuestas: [] } }
+const salas = {};
 
-// Conexiones en tiempo real con Socket.IO
+// Función para generar un PIN de 6 dígitos único entre las salas activas
+function generarPinUnico() {
+    const pin = Math.floor(100000 + Math.random() * 900000).toString();
+    if (salas[pin]) {
+        return generarPinUnico(); // Si ya existe, genera otro
+    }
+    return pin;
+}
+
 io.on('connection', (socket) => {
     console.log(`Nuevo cliente conectado: ${socket.id}`);
 
-    // --- AGREGADO: EL PROFESOR SE UNE A LA SALA ---
-    socket.on('profe:iniciar', () => {
-        socket.join(salaActual.pin);
-        socket.emit('profe:actualizar-estudiantes', salaActual.estudiantes);
-        socket.emit('profe:actualizar-respuestas', salaActual.respuestas);
+    // --- EVENTOS DEL PROFESOR ---
+
+    // El profesor crea una nueva sala dinámicamente
+    socket.on('profe:crear-sala', (callback) => {
+        const nuevoPin = generarPinUnico();
+
+        salas[nuevoPin] = {
+            pin: nuevoPin,
+            profeSocketId: socket.id,
+            preguntaActual: null,
+            estudiantes: [],
+            respuestas: []
+        };
+
+        socket.join(nuevoPin);
+        socket.pinSala = nuevoPin; // Guardamos el PIN en la sesión del socket
+
+        console.log(`Sala creada con PIN: ${nuevoPin}`);
+
+        callback({ exito: true, pin: nuevoPin });
     });
 
-    // El profe lanza una nueva pregunta
+    // El profe lanza una nueva pregunta en su sala
     socket.on('profe:lanzar-pregunta', (datos) => {
-        salaActual.preguntaActual = {
+        const pin = socket.pinSala;
+        if (!pin || !salas[pin]) return;
+
+        salas[pin].preguntaActual = {
             texto: datos.texto,
             respuestaCorrecta: datos.respuestaCorrecta.toString().trim().toLowerCase()
         };
-        salaActual.respuestas = []; // Reinicia respuestas para la nueva pregunta
+        salas[pin].respuestas = [];
 
-        // Notifica a los estudiantes y al profe que la pregunta cambió
-        io.to(salaActual.pin).emit('estudiante:nueva-pregunta', { texto: datos.texto });
-        io.to(salaActual.pin).emit('profe:actualizar-respuestas', []);
+        io.to(pin).emit('estudiante:nueva-pregunta', { texto: datos.texto });
+        io.to(pin).emit('profe:actualizar-respuestas', []);
     });
 
     // --- EVENTOS DEL ESTUDIANTE ---
 
-    // El estudiante intenta unirse a la sala con su nombre y PIN
     socket.on('estudiante:unirse', (datos, callback) => {
-        if (datos.pin !== salaActual.pin) {
-            return callback({ exito: false, mensaje: "El PIN ingresado no existe." });
+        const pin = datos.pin ? datos.pin.trim() : "";
+        const sala = salas[pin];
+
+        if (!sala) {
+            return callback({ exito: false, mensaje: "El PIN ingresado no existe o la sala ya fue cerrada." });
         }
 
-        socket.join(salaActual.pin);
+        socket.join(pin);
+        socket.pinSala = pin;
         socket.nombreEstudiante = datos.nombre;
 
-        // Agregar a la lista de estudiantes si no está repetido
-        const existe = salaActual.estudiantes.some(e => e.id === socket.id);
+        const existe = sala.estudiantes.some(e => e.id === socket.id);
         if (!existe) {
-            salaActual.estudiantes.push({ id: socket.id, nombre: datos.nombre });
+            sala.estudiantes.push({ id: socket.id, nombre: datos.nombre });
         }
 
-        // Avisar al profesor que hay un nuevo estudiante
-        io.to(salaActual.pin).emit('profe:actualizar-estudiantes', salaActual.estudiantes);
+        // Notificar al profe de ESTA sala específica
+        io.to(pin).emit('profe:actualizar-estudiantes', sala.estudiantes);
 
-        // Enviar al estudiante la pregunta actual si ya hay una activa
-        const preguntaTexto = salaActual.preguntaActual ? salaActual.preguntaActual.texto : null;
+        const preguntaTexto = sala.preguntaActual ? sala.preguntaActual.texto : null;
         callback({ exito: true, preguntaActual: preguntaTexto });
     });
 
-    // El estudiante envía su respuesta
     socket.on('estudiante:responder', (respuestaTexto, callback) => {
-        if (!salaActual.preguntaActual) {
+        const pin = socket.pinSala;
+        const sala = salas[pin];
+
+        if (!sala || !sala.preguntaActual) {
             return callback({ exito: false, mensaje: "No hay una pregunta activa." });
         }
 
         const respuestaLimpia = respuestaTexto.toString().trim().toLowerCase();
-        const esCorrecto = (respuestaLimpia === salaActual.preguntaActual.respuestaCorrecta);
+        const esCorrecto = (respuestaLimpia === sala.preguntaActual.respuestaCorrecta);
 
         const intencional = {
             nombre: socket.nombreEstudiante || "Anónimo",
@@ -84,17 +110,27 @@ io.on('connection', (socket) => {
             esCorrecto: esCorrecto
         };
 
-        // Guardar y notificar al profesor
-        salaActual.respuestas.push(intencional);
-        io.to(salaActual.pin).emit('profe:actualizar-respuestas', salaActual.respuestas);
+        sala.respuestas.push(intencional);
+        io.to(pin).emit('profe:actualizar-respuestas', sala.respuestas);
 
         callback({ exito: true, esCorrecto: esCorrecto });
     });
 
-    // Desconexión de un usuario
+    // --- MANEJO DE DESCONEXIÓN ---
     socket.on('disconnect', () => {
-        salaActual.estudiantes = salaActual.estudiantes.filter(e => e.id !== socket.id);
-        io.to(salaActual.pin).emit('profe:actualizar-estudiantes', salaActual.estudiantes);
+        const pin = socket.pinSala;
+        if (pin && salas[pin]) {
+            if (socket.esProfe) {
+                io.to(pin).emit('estudiante:sala-cerrada', { 
+                    mensaje: "El profesor ha salido. La clase ha finalizado." 
+                });
+                delete salas[pin];
+                console.log(`Sala ${pin} eliminada por desconexión del profesor.`);
+            } else {
+                salas[pin].estudiantes = salas[pin].estudiantes.filter(e => e.id !== socket.id);
+                io.to(pin).emit('profe:actualizar-estudiantes', salas[pin].estudiantes);
+            }
+        }
     });
 });
 

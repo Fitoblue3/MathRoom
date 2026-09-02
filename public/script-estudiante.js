@@ -110,3 +110,22 @@ btnEnviarRespuesta.addEventListener('click', () => {
         }
     });
 });
+
+// Listener cuando el profesor cierra la sala o sale
+socket.on('estudiante:sala-cerrada', (datos) => {
+    alert(datos.mensaje);
+
+    // 1. Ocultar el panel del ejercicio y volver al selector de PIN
+    pasoEjercicio.style.display = 'none';
+    pasoNombre.style.display = 'none';
+    pasoPin.style.display = 'flex';
+
+    // 2. Limpiar variables de sesión y campos de texto
+    pinActual = "";
+    nombreActual = "";
+    inputPin.value = "";
+    inputNombre.value = "";
+
+    // 3. Limpiar parámetros de la URL (?pin=...) sin recargar la página para evitar auto-logins
+    window.history.replaceState({}, document.title, window.location.pathname);
+});

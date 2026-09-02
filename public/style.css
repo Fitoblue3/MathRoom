@@ -572,6 +572,10 @@ footer {
     padding: 0;
 }
 
+.pregunta-activa-box {
+    align-items: center;
+}
+
 .pregunta-activa-box strong {
     font-size: 1.2rem;
     color: #1e293b;

@@ -7,6 +7,8 @@ const btnAbrirQr = document.getElementById('btnAbrirQr');
 const modalLista = document.getElementById('modalLista');
 const btnAbrirLista = document.getElementById('btnAbrirLista');
 
+const codigoPinLabel = document.getElementById("codigoPin")
+
 const inputPregunta = document.getElementById('pregunta');
 const inputRespuesta = document.getElementById('respuesta');
 const btnLanzar = document.getElementById('btnLanzar');
@@ -18,6 +20,19 @@ const cantEstudiantes = document.getElementById('cantEstudiantes');
 const listaEstudiantesContainer = document.getElementById('listaEstudiantesContainer');
 
 let qrGenerado = null;
+let pinSalaActual = "";
+
+// --- CONEXIÓN E INICIALIZACIÓN DE SALA ---
+socket.on('connect', () => {
+    // Pedir al servidor la creación de una sala única
+    socket.emit('profe:crear-sala', (respuesta) => {
+        if (respuesta.exito) {
+            pinSalaActual = respuesta.pin;
+            if (codigoPinLabel) codigoPinLabel.textContent = pinSalaActual;
+
+        }
+    });
+})
 
 // --- EVENTOS DE MODALES ---
 
@@ -28,13 +43,13 @@ btnAbrirQr.addEventListener('click', () => {
     const contenedorQr = document.getElementById('qrcode');
     
     // Si aún no se ha generado el QR, crearlo
-    if (!qrGenerado) {
+    if (pinSalaActual) {
         contenedorQr.innerHTML = ''; 
 
         const ipLocal = "172.16.70.2";
-        const urlEstudiante = `http://${ipLocal}:3000/estudiante.html?pin=281007`;
+        const urlEstudiante = `http://${ipLocal}:3000/estudiante.html?pin=${pinSalaActual}`;
 
-        qrGenerado = new QRCode(contenedorQr, {
+        new QRCode(contenedorQr, {
             text: urlEstudiante,
             width: 200,
             height: 200,
@@ -114,4 +129,9 @@ socket.on('profe:actualizar-respuestas', (respuestas) => {
         `;
         respuestasGrid.appendChild(div);
     });
+});
+
+// Notificar al servidor inmediatamente si el profesor abandona o recarga la página
+window.addEventListener('beforeunload', () => {
+    socket.emit('profe:cerrar-sala-manual');
 });
