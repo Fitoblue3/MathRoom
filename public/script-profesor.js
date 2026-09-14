@@ -43,7 +43,6 @@ btnAbrirQr.addEventListener('click', () => {
     
     if (pinSalaActual) {
         contenedorQr.innerHTML = ''; 
-        const ipLocal = "172.16.70.2";
         const urlEstudiante = `${window.location.origin}/estudiante.html?pin=${pinSalaActual}`;
 
         new QRCode(contenedorQr, {
