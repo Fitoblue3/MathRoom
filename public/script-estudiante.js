@@ -130,12 +130,32 @@ btnEnviarRespuesta.addEventListener('click', () => {
         if (respuesta.exito) {
             respuestaEstudiante.disabled = true;
             btnEnviarRespuesta.disabled = true;
+
+            // Limpiar clases previas (correcto/incorrecto)
+            feedbackRespuesta.className = 'feedback-box';
+
+            if (respuesta.esCorrecto) {
+                feedbackRespuesta.classList.add('feedback-correcto');
+                feedbackRespuesta.innerHTML = `
+                    <span class="material-symbols-outlined icon-feedback">check_circle</span>
+                    <p><strong>¡Excelente!</strong> Tu respuesta es correcta. Espera a que el profe cambie la pregunta.</p>
+                `;
+            } else {
+                feedbackRespuesta.classList.add('feedback-incorrecto');
+                feedbackRespuesta.innerHTML = `
+                    <span class="material-symbols-outlined icon-feedback">cancel</span>
+                    <p><strong>¡Respuesta incorrecta!</strong> Revisa el procedimiento. Espera a la siguiente pregunta.</p>
+                `;
+            }
+
             feedbackRespuesta.style.display = 'flex';
         } else {
             alert(respuesta.mensaje);
         }
     });
 });
+
+
 
 // Cierre de sala por el profesor
 socket.on('estudiante:sala-cerrada', (datos) => {

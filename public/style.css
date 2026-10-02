@@ -775,6 +775,34 @@ footer {
 }
 
 .feedback-box {
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    text-align: left;
+    margin-top: 15px;
+    border: 1px solid transparent;
+}
+
+.feedback-box.feedback-correcto {
+    background-color: #dcfce7;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+.feedback-box.feedback-correcto .icon-feedback {
+    color: #15803d;
+}
+
+.feedback-box.feedback-incorrecto {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.feedback-box {
     background-color: #dcfce7;
     color: #166534;
     padding: 15px;
@@ -788,5 +816,4 @@ footer {
 
 .icon-feedback {
     font-size: 1.8rem !important;
-    color: #15803d;
 }
