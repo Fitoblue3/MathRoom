@@ -51,18 +51,20 @@
                     <strong id="textoPreguntaActiva">--</strong>
                 </div>
             </section>
-
+            
             <section class="card-section respuestas-section">
-                <h2><span class="material-symbols-outlined">monitoring</span> Respuestas en Tiempo Real</h2>
-                
-                <div class="respuestas-grid" id="respuestasGrid">
-                    <!-- respuesta correcta 
-                    <div class="respuesta-card correcto"></div>-->
+            <h2><span class="material-symbols-outlined">monitoring</span> Respuestas en Tiempo Real</h2>
 
-                    <!-- respuesta incorrecta 
-                    <div class="respuesta-card incorrecto"></div>-->
-                </div>
-            </section>
+            <h3 class="subtitulo-grid">
+                <span class="material-symbols-outlined">description</span> Respuestas Escritas
+            </h3>
+            <div class="respuestas-grid" id="respuestasGrid"></div>
+
+            <h3 class="subtitulo-grid">
+                <span class="material-symbols-outlined">image</span> Evidencias en Foto
+            </h3>
+            <div class="fotos-grid" id="fotosGrid"></div>
+        </section>
         </main>
         <footer>
             <div class="btn-enlaces">
@@ -117,6 +119,13 @@
                 </ul>
 
                 <p class="modal-tip">Haz clic fuera de este recuadro para cerrar</p>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modalZoom" style="display: none;">
+            <div class="modal-card modal-zoom-card">
+                <img id="imgZoomed" src="" alt="Foto ampliada" style="max-width: 90vw; max-height: 80vh; object-fit: contain;">
+                <p class="modal-tip">Haz clic en cualquier parte para cerrar</p>
             </div>
         </div>
         

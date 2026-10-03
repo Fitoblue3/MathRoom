@@ -68,10 +68,44 @@
                     <span class="icon material-symbols-outlined">send</span>
                 </button>
 
+                <!-- Sección de Respuesta con Foto -->
+                <div class="input-block">
+                    <label>Adjuntar Foto / Captura:</label>
+                    <input type="file" id="inputFoto" accept="image/*" capture="environment" style="display: none;" />
+                    
+                    <div class="actions-foto">
+                        <button id="btnTomarFoto" class="btn btn-secondary">
+                            <span class="material-symbols-outlined">photo_camera</span> Seleccionar / Tomar Foto
+                        </button>
+                        
+                        <div id="previewFotoContainer" style="display: none;">
+                            <img id="imgPreview" alt="Vista previa" />
+                            <button id="btnRemoverFoto" class="btn btn-danger"> <span class="material-symbols-outlined">delete</span>Eliminar foto</button>
+                        </div>
+                </div>
+                    
+                    <button type="button" id="btnEnviarFoto" class="btn btn-primary" disabled>
+                        <span class="material-symbols-outlined">upload</span> Enviar Foto
+                    </button>
+                </div>
+
                 <div class="feedback-box" id="feedbackRespuesta" style="display: none;">
                     <span class="material-symbols-outlined icon-feedback">check_circle</span>
                     <p>¡Respuesta enviada! Espera a que el profe cambie la pregunta.</p>
                 </div>
+
+                <div class="feedback-retro-container" id="feedbackContainer" style="display: none;">
+                    <div id="statusCompletadoBox" class="status-completado-box" style="display: none;">
+                        <span class="material-symbols-outlined icon-success">check_circle</span>
+                        <h3>¡Completado, todo perfecto!</h3>
+                    </div>
+
+                    <div id="comentariosBox" class="comentarios-box" style="display: none;">
+                        <h4><span class="material-symbols-outlined">comment</span> Comentarios del Profesor:</h4>
+                        <ul id="listaComentarios"></ul>
+                    </div>
+                </div>
+
             </section>
         </main>
 

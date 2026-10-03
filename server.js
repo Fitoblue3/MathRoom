@@ -6,8 +6,9 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    pingTimeout: 2000,   // Espera solo 2 segundos de inactividad antes de considerar desconectado
-    pingInterval: 1000   // Envía un "ping" de control cada 1 segundo
+    maxHttpBufferSize: 1e7, // 10 MB para imágenes
+    pingTimeout: 5000,   // Espera solo 2 segundos de inactividad antes de considerar desconectado
+    pingInterval: 10000   // Envía un "ping" de control cada 1 segundo
 });
 
 const PORT = 3000;
@@ -63,14 +64,53 @@ socket.on('profe:crear-sala', (datos, callback) => {
         const pin = socket.pinSala;
         if (!pin || !salas[pin]) return;
 
-        salas[pin].preguntaActual = {
+        salas[pin].preguntaActual = { 
             texto: datos.texto,
-            respuestaCorrecta: datos.respuestaCorrecta.toString().trim().toLowerCase()
+            respuestaCorrecta: datos.respuestaCorrecta 
         };
-        salas[pin].respuestas = [];
+        salas[pin].respuestas = {}; // Reiniciar respuestas para la nueva pregunta
 
         io.to(pin).emit('estudiante:nueva-pregunta', { texto: datos.texto });
         io.to(pin).emit('profe:actualizar-respuestas', []);
+    });
+
+    // Profesor envía un comentario a un estudiante
+    socket.on('profe:enviar-comentario', ({ estudianteId, comentario }, callback) => {
+        const pin = socket.pinSala;
+        const sala = salas[pin];
+        if (!sala || !sala.respuestas[estudianteId]) return;
+
+        sala.respuestas[estudianteId].comentarios.push(comentario);
+        sala.respuestas[estudianteId].completado = false;
+
+        // Notificar al estudiante específico
+        io.to(estudianteId).emit('estudiante:recibir-retroalimentacion', {
+            comentarios: sala.respuestas[estudianteId].comentarios,
+            completado: false
+        });
+
+        // Actualizar grid del profe
+        io.to(pin).emit('profe:actualizar-respuestas', Object.values(sala.respuestas));
+        if (typeof callback === 'function') callback({ exito: true });
+    });
+
+    // Profesor marca como completado el ejercicio de un estudiante
+    socket.on('profe:marcar-completado', ({ estudianteId }, callback) => {
+        const pin = socket.pinSala;
+        const sala = salas[pin];
+        if (!sala || !sala.respuestas[estudianteId]) return;
+
+        sala.respuestas[estudianteId].completado = true;
+
+        // Notificar al estudiante específico
+        io.to(estudianteId).emit('estudiante:recibir-retroalimentacion', {
+            comentarios: sala.respuestas[estudianteId].comentarios,
+            completado: true
+        });
+
+        // Actualizar grid del profe
+        io.to(pin).emit('profe:actualizar-respuestas', Object.values(sala.respuestas));
+        if (typeof callback === 'function') callback({ exito: true });
     });
 
     // --- EVENTOS DEL ESTUDIANTE ---
@@ -99,7 +139,8 @@ socket.on('profe:crear-sala', (datos, callback) => {
         callback({ exito: true, preguntaActual: preguntaTexto });
     });
 
-    socket.on('estudiante:responder', (respuestaTexto, callback) => {
+   socket.on('estudiante:responder', (datosPayload, callback) => {
+        if (typeof callback !== 'function') callback = () => {};
         const pin = socket.pinSala;
         const sala = salas[pin];
 
@@ -107,19 +148,47 @@ socket.on('profe:crear-sala', (datos, callback) => {
             return callback({ exito: false, mensaje: "No hay una pregunta activa." });
         }
 
-        const respuestaLimpia = respuestaTexto.toString().trim().toLowerCase();
-        const esCorrecto = (respuestaLimpia === sala.preguntaActual.respuestaCorrecta);
-
-        const intencional = {
-            nombre: socket.nombreEstudiante || "Anónimo",
-            respuesta: respuestaTexto,
-            esCorrecto: esCorrecto
+        const tipo = datosPayload?.tipo; // 'texto' o 'foto'
+        const contenido = datosPayload?.contenido;
+        
+        // Recuperar registro anterior o inicializar uno nuevo
+        const registroPrevio = sala.respuestas[socket.id] || { 
+            texto: "", 
+            esCorrecto: false, 
+            foto: null, 
+            comentarios: [], 
+            completado: false 
         };
 
-        sala.respuestas.push(intencional);
-        io.to(pin).emit('profe:actualizar-respuestas', sala.respuestas);
+        let esCorrectoResult = registroPrevio.esCorrecto;
 
-        callback({ exito: true, esCorrecto: esCorrecto });
+        if (tipo === 'texto') {
+            registroPrevio.texto = contenido;
+            
+            // Comparación limpia sin espacios ni mayúsculas
+            const respUsuario = String(contenido || '').trim().toLowerCase();
+            const respCorrecta = String(sala.preguntaActual.respuestaCorrecta || '').trim().toLowerCase();
+            
+            esCorrectoResult = (respUsuario === respCorrecta);
+            registroPrevio.esCorrecto = esCorrectoResult;
+        } else if (tipo === 'foto') {
+            registroPrevio.foto = contenido;
+        }
+
+        sala.respuestas[socket.id] = {
+            id: socket.id,
+            nombre: socket.nombreEstudiante || "Anónimo",
+            texto: registroPrevio.texto,
+            esCorrecto: registroPrevio.esCorrecto,
+            foto: registroPrevio.foto,
+            comentarios: registroPrevio.comentarios,
+            completado: registroPrevio.completado
+        };
+
+        // Notificar al profesor con la lista de respuestas actualizada
+        io.to(pin).emit('profe:actualizar-respuestas', Object.values(sala.respuestas));
+        
+        callback({ exito: true, esCorrecto: esCorrectoResult });
     });
 
     // --- MANEJO DE DESCONEXIÓN ---
