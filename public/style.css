@@ -1233,10 +1233,24 @@ footer {
 }
 
 .modal-card.modal-zoom-card{
-    min-width: 90%;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 #imgZoomed {
     max-width: 100%;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    max-height: 75vh; 
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
