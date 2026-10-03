@@ -173,7 +173,8 @@ socket.on('profe:actualizar-respuestas', (respuestas) => {
                 </div>
                 <div class="card-body-estudiante">
                     <div class="res-foto-box">
-                        <img src="${resp.foto}" alt="Procedimiento de ${resp.nombre}" onclick="abrirZoom('${resp.foto}')">
+                        <!-- Se le agrega la clase 'img-evidencia' y se remueve el onclick inline -->
+                        <img src="${resp.foto}" class="img-evidencia" alt="Procedimiento de ${resp.nombre}">
                     </div>
                     ${renderAccionesFoto(resp)}
                 </div>
@@ -216,12 +217,42 @@ function renderAccionesFoto(resp) {
     `;
 }
 
-// Cerrar modal de zoom al hacer clic sobre él
+// Delegación de eventos para abrir el modal al hacer clic en la foto o en su contenedor
+if (fotosGrid) {
+    fotosGrid.addEventListener('click', (e) => {
+        // Busca si se hizo clic en la imagen (.img-evidencia) o en la caja contenedora (.res-foto-box)
+        const targetImg = e.target.closest('.res-foto-box')?.querySelector('img') || (e.target.classList.contains('img-evidencia') ? e.target : null);
+
+        if (targetImg) {
+            e.stopPropagation(); // Evita que el clic viaje al document y cierre el modal inmediatamente
+            const modalZoom = document.getElementById('modalZoom');
+            const imgZoomed = document.getElementById('imgZoomed');
+
+            if (modalZoom && imgZoomed) {
+                imgZoomed.src = targetImg.src;
+                modalZoom.style.display = 'flex';
+                modalZoom.classList.add('active'); // Activa la visibilidad y eventos de puntero del CSS
+            }
+        }
+    });
+}
+
+// Cierre del modal de zoom
 document.addEventListener('DOMContentLoaded', () => {
     const modalZoom = document.getElementById('modalZoom');
+
     if (modalZoom) {
-        modalZoom.addEventListener('click', function() {
-            this.style.display = 'none';
+        modalZoom.addEventListener('click', () => {
+            modalZoom.style.display = 'none';
+            modalZoom.classList.remove('active');
         });
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    const modalZoom = document.getElementById('modalZoom');
+    if (e.key === 'Escape' && modalZoom && modalZoom.classList.contains('active')) {
+        modalZoom.style.display = 'none';
+        modalZoom.classList.remove('active');
     }
 });

@@ -30,6 +30,7 @@ const btnEnviarFoto = document.getElementById('btnEnviarFoto');
 const previewFotoContainer = document.getElementById('previewFotoContainer');
 const imgPreview = document.getElementById('imgPreview');
 const btnRemoverFoto = document.getElementById('btnRemoverFoto');
+const feedbackFotoEnviada = document.getElementById('feedbackFotoEnviada');
 
 let pinActual = "";
 let nombreActual = "";
@@ -143,6 +144,9 @@ socket.on('estudiante:nueva-pregunta', (datos) => {
     statusCompletadoBox.style.display = 'none';
     comentariosBox.style.display = 'none';
     listaComentarios.innerHTML = '';
+    btnTomarFoto.style.display = 'flex';
+    btnTomarFoto.disabled = false;
+    if (feedbackFotoEnviada) feedbackFotoEnviada.style.display = 'none';
 });
 
 // Enviar respuesta
@@ -186,6 +190,9 @@ btnTomarFoto.addEventListener('click', () => inputFoto.click());
 inputFoto.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
+
+        if (feedbackFotoEnviada) feedbackFotoEnviada.style.display = 'none';
+
         const reader = new FileReader();
         reader.onload = function(event) {
             fotoBase64 = event.target.result;
@@ -206,6 +213,7 @@ function limpiarFoto() {
     inputFoto.value = '';
     previewFotoContainer.style.display = 'none';
     btnEnviarFoto.disabled = true;
+    if (feedbackFotoEnviada) feedbackFotoEnviada.style.display = 'none';
 }
 
 btnEnviarFoto.addEventListener('click', () => {
@@ -214,11 +222,39 @@ btnEnviarFoto.addEventListener('click', () => {
         return;
     }
 
+    if (feedbackFotoEnviada) {
+        feedbackFotoEnviada.style.display = 'none';
+        feedbackFotoEnviada.textContent = '';
+    }
+
     socket.emit('estudiante:responder', { tipo: 'foto', contenido: fotoBase64 }, (respuesta) => {
-        if (respuesta.exito) {
+        if (respuesta && respuesta.exito) {
+            // 1. Ocultar la vista previa y deshabilitar botón
+            previewFotoContainer.style.display = 'none';
             btnEnviarFoto.disabled = true;
+
+            // 2. Insertar el contenido y mostrar el mensaje de éxito
+            if (feedbackFotoEnviada) {
+                feedbackFotoEnviada.className = 'feedback-box feedback-correcto';
+                feedbackFotoEnviada.innerHTML = `
+                    <span class="material-symbols-outlined icon-feedback">check_circle</span>
+                    <p><strong>¡Foto enviada con éxito!</strong> Espera las observaciones del profesor.</p>
+                `;
+                feedbackFotoEnviada.style.display = 'flex';
+            }
+
+            // 3. Limpiar los datos internos de la foto actual
+            fotoBase64 = null;
+            inputFoto.value = '';
         } else {
-            alert(respuesta.mensaje) || 'No se pudo enviar la foto.';
+            if (feedbackFotoEnviada) {
+                feedbackFotoEnviada.className = 'feedback-box feedback-incorrecto';
+                feedbackFotoEnviada.innerHTML = `
+                    <span class="material-symbols-outlined icon-feedback">cancel</span>
+                    <p>${respuesta?.mensaje || 'No se pudo enviar la foto.'}</p>
+                `;
+                feedbackFotoEnviada.style.display = 'flex';
+            }
         }
     });
 });

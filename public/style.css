@@ -1001,6 +1001,20 @@ footer {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
+.info-user {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.completado {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
 .foto-card img {
   width: 100%;
   height: 160px;
@@ -1091,6 +1105,14 @@ footer {
     transform: translateY(1px);
 }
 
+#btnEnviarFoto:disabled {
+    background-color: #94a3b8 !important;
+    color: #ffffff;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    opacity: 0.7;
+}
 
 #btnRemoverFoto {
     display: flex;
@@ -1190,4 +1212,31 @@ footer {
     display: flex;
     justify-content: center;
     gap: 5px;
+}
+.status-completado-box {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid rgba(37, 211, 102, 0.28);
+    padding: 15px;
+    border-radius: 8px;
+    gap: 5px;
+}
+
+#modalZoom {
+    z-index: 2000; /* Asegura que se dibuje por encima de cualquier otro elemento o modal */
+}
+
+#modalZoom.active {
+    opacity: 1;
+    pointer-events: auto;
+    display: flex !important;
+}
+
+.modal-card.modal-zoom-card{
+    min-width: 90%;
+}
+
+#imgZoomed {
+    max-width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
